@@ -4,31 +4,27 @@
     <title>Venn Diagram for Qualtrics</title>
     <style>
         .circle {
-            position: absolute;
-            top: 10px;
             width: 300px;
             height: 300px;
             padding: 10px 0px
         }
 
         #circle1 {
-
+            left: 500px;
         }
 
         #container {
-            width: 800px;
-            height: 320px;
-            padding: 0;
-            border: 1px #FF0000 solid
+            position: relative;
+            top: 100px;
+            border: 3px rgba(100, 100, 100, 0.6) solid;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 <div id="container"/>
-<div id="circle0" class="ui-widget-content circle">
-</div>
-<div id="circle1" class="ui-widget-content circle">
-</div>
 <script>
     //var $$ = $;
     //console.log($);
@@ -36,43 +32,102 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
     //var jQuery = $;
-    // $ = $$;
+    // $ = $$;-
     $$ = jQuery;
 </script>
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 <script type="text/javascript">
+    var venn = {};
+    var marginHeight = 20;
+
+    var circle = {};
+    circle.r = 150;
+
+    venn.width = circle.r * 4;
+    venn.height = circle.r * 2 + marginHeight;
+
+    $$('#container').width(venn.width + "px");
+    $$('#container').height(venn.height + "px");
+
     $$(document).ready(function () {
         //draw circles
-        var c0 = Raphael("circle0", 300, 300);
+        var R = Raphael("container", venn.width, venn.height);
         var c = Raphael.getColor();
-        c0.circle(150, 150, 150).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4});
+        var c0 = R.circle(circle.r, venn.height / 2, circle.r).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
 
-        var c1 = Raphael("circle1", 300, 300);
-        var c = Raphael.getColor();
-        c1.circle(150, 150, 150).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4});
+        c = Raphael.getColor();
+        var c1 = R.circle(venn.width - circle.r, venn.height / 2, circle.r).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
 
 
-        $$(function () {
-            $$("#circle0").draggable({
-                axis: "x",
-                containment: "#container",
-                drag: function () {
-                    var xPos = $$(this).offset().left;
-                    console.log(xPos);
-                    // $("QR~QID2").setValue(xPos);
-                }
-            });
-            $$("#circle1").draggable({
-                axis: "x",
-                containment: "#container",
-                drag: function () {
-                    var xPos = $$(this).offset().left;
-                    console.log(xPos);
-                    // $("QR~QID2").setValue(xPos);
-                }
-            });
-        });
+        var start = function () {
+            this.toFront();
+            this.ox = this.attr("cx");
+            this.animate({r: circle.r, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
+        }
+        var move = function (dx, dy) {
+            var x = this.ox + dx;
+            var other = this == c0 ? c1 : c0;
+            //check bounds
+            if (x > venn.width - circle.r) {
+                x = venn.width - circle.r;
+            } else if (x < circle.r) {
+                x = circle.r;
+            }
+            this.attr({cx: x});
+            var other_x = venn.width - x;
+            other.attr({cx: other_x});
+            //set value
+            var d = Math.abs(x - other_x);
+            var r = circle.r;
+            var overlapArea = areaOfIntersection(x, 0, r, other_x, 0, r);
+
+                    /*2 * (Math.pow(r, 2) * Math.acos(Math.pow(d, 2) / (2 * d * r)))
+                    - 0.5 * Math.sqrt((-d + r * 2) * (2 * d) * (d + 2 * r));*/
+            var area = Math.PI * Math.pow(r, 2);
+            var percentOverlap = Math.round(overlapArea / area * 10000) / 100;
+            if (isNaN(percentOverlap)) percentOverlap = 100;
+            console.log(percentOverlap);
+        }
+        var up = function () {
+            this.animate({r: circle.r, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
+        }
+        R.set(c0, c1).drag(move, start, up);
+
+
+        function areaOfIntersection(x0, y0, r0, x1, y1, r1) {
+            //from http://stackoverflow.com/questions/4247889/area-of-intersection-between-two-circles
+            var rr0 = r0 * r0;
+            var rr1 = r1 * r1;
+            var d = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+
+            // Circles do not overlap
+            if (d > r1 + r0) {
+                return 0;
+            }
+
+            // Circle1 is completely inside circle0
+            else if (d <= Math.abs(r0 - r1) && r0 >= r1) {
+                // Return area of circle1
+                return Math.PI * rr1;
+            }
+
+            // Circle0 is completely inside circle1
+            else if (d <= Math.abs(r0 - r1) && r0 < r1) {
+                // Return area of circle0
+                return Math.PI * rr0;
+            }
+
+            // Circles partially overlap
+            else {
+                var phi = (Math.acos((rr0 + (d * d) - rr1) / (2 * r0 * d))) * 2;
+                var theta = (Math.acos((rr1 + (d * d) - rr0) / (2 * r1 * d))) * 2;
+                var area1 = 0.5 * theta * rr1 - 0.5 * rr1 * Math.sin(theta);
+                var area2 = 0.5 * phi * rr0 - 0.5 * rr0 * Math.sin(phi);
+
+                // Return area of intersection
+                return area1 + area2;
+            }
+        }
     });
 
 </script>
