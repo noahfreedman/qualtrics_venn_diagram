@@ -3,39 +3,73 @@
 <head>
     <title>Venn Diagram for Qualtrics</title>
     <style>
-        #draggable { width: 150px; height: 150px; padding: 10px; border: 1px #FF0000 solid }
-        #container { width: 600px; height: 172px; padding: 0; border: 1px #FF0000 solid }
+        .circle {
+            position: absolute;
+            top: 10px;
+            width: 300px;
+            height: 300px;
+            padding: 10px 0px
+        }
+
+        #circle1 {
+
+        }
+
+        #container {
+            width: 800px;
+            height: 320px;
+            padding: 0;
+            border: 1px #FF0000 solid
+        }
     </style>
 </head>
 <body>
 <div id="container"/>
-<div id="draggable" class="ui-widget-content">
-    <p>Drag me around</p>
+<div id="circle0" class="ui-widget-content circle">
 </div>
+<div id="circle1" class="ui-widget-content circle">
 </div>
 <script>
-    var $$ = $;
-    console.log($);
+    //var $$ = $;
+    //console.log($);
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
-    var jQuery = $;
-    $ = $$;
+    //var jQuery = $;
+    // $ = $$;
     $$ = jQuery;
 </script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 <script type="text/javascript">
-    $$(document).ready(function() {
-        var drag = $$('#draggable');
-        $$(function() {
-            $$( "#draggable" ).draggable({
+    $$(document).ready(function () {
+        //draw circles
+        var c0 = Raphael("circle0", 300, 300);
+        var c = Raphael.getColor();
+        c0.circle(150, 150, 150).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4});
+
+        var c1 = Raphael("circle1", 300, 300);
+        var c = Raphael.getColor();
+        c1.circle(150, 150, 150).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4});
+
+
+        $$(function () {
+            $$("#circle0").draggable({
                 axis: "x",
                 containment: "#container",
-                drag: function() {
+                drag: function () {
                     var xPos = $$(this).offset().left;
                     console.log(xPos);
-                   // $("QR~QID2").setValue(xPos);
+                    // $("QR~QID2").setValue(xPos);
+                }
+            });
+            $$("#circle1").draggable({
+                axis: "x",
+                containment: "#container",
+                drag: function () {
+                    var xPos = $$(this).offset().left;
+                    console.log(xPos);
+                    // $("QR~QID2").setValue(xPos);
                 }
             });
         });
