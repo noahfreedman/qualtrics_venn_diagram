@@ -66,15 +66,25 @@
         }
         var move = function (dx, dy) {
             var x = this.ox + dx;
-            var other = this == c0 ? c1 : c0;
-            //check bounds
-            if (x > venn.width - circle.r) {
-                x = venn.width - circle.r;
-            } else if (x < circle.r) {
-                x = circle.r;
+            var leftBound, rightBound, other;
+            if (this == c0) {
+                other = c1;
+                leftBound = circle.r;
+                rightBound = venn.width / 2;
+            } else {
+                other = c0;
+                leftBound = venn.width / 2;
+                rightBound = venn.width - circle.r;
             }
-            this.attr({cx: x});
+            //check bounds
+            if (x > rightBound) {
+                x = rightBound;
+            } else if (x < leftBound) {
+                x = leftBound;
+            }
             var other_x = venn.width - x;
+
+            this.attr({cx: x});
             other.attr({cx: other_x});
             //set value
             var d = Math.abs(x - other_x);
