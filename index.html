@@ -9,13 +9,39 @@
 </head>
 <body>
 <div id="container"/>
-    <div id="draggable" class="ui-widget-content">
-        <p>Drag me around</p>
-    </div>
+<div id="draggable" class="ui-widget-content">
+    <p>Drag me around</p>
 </div>
+</div>
+<script>
+    var $$ = $;
+    console.log($);
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    var jQuery = $;
+    $ = $$;
+    $$ = jQuery;
+</script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script type="text/javascript">
+    $$(document).ready(function() {
+        var drag = $$('#draggable');
+        $$(function() {
+            $$( "#draggable" ).draggable({
+                axis: "x",
+                containment: "#container",
+                drag: function() {
+                    var xPos = $$(this).offset().left;
+                    console.log(xPos);
+                   // $("QR~QID2").setValue(xPos);
+                }
+            });
+        });
+    });
 
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-<script type="text/javascript" src=main.js></script>
+</script>
+
 </body>
 </html>
