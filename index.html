@@ -1,41 +1,45 @@
-<!DOCTYPE html>
-<html>
+
 <head>
     <title>Venn Diagram for Qualtrics</title>
     <style>
-        .circle {
-            width: 300px;
-            height: 300px;
-            padding: 10px 0px
-        }
-
-        #circle1 {
-            left: 500px;
-        }
-
         #container {
             position: relative;
-            top: 100px;
+            top: 0px;
             border: 3px rgba(100, 100, 100, 0.6) solid;
             -webkit-border-radius: 10px;
             -moz-border-radius: 10px;
             border-radius: 10px;
         }
+        .noselect {
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
 <div id="container"/>
-<script>
+<script type="text/javascript" >
+
+    /* ========= VARIABLES ======== */
+
     var text1 = "African Americans";
     var text2 = "Asian Americans";
     var circle_radius = 150;
-    //var $$ = $;
-    //console.log($);
+
+    /* =========-----------======== */
+
+</script>
+<script type="text/javascript" >
+    var $$ = $;
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>
-    //var jQuery = $;
-    // $ = $$;-
+<script type="text/javascript" >
+    var jQuery = $;
+    $ = $$;
     $$ = jQuery;
 </script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
@@ -62,12 +66,23 @@
         var t1 = R.text(venn.width - circle_radius / 3, venn.height / 2, text2).attr({});
         c1.text = t1;
 
-        var start = function () {
+        $$('text').addClass("noselect");
+        $$("#container").parent().addClass("noselect");
+        var qName = $$("#container").parent().attr("for");
+        $$($(qName)).addClass("noselect");
+
+        //move to random position
+        var pos = Math.random() * (venn.width / 2 - circle_radius);
+        start.apply(c0);
+        move.apply(c0, [pos, 0]);
+        up.apply(c0);
+
+       function start () {
             this.toFront();
             this.ox = this.attr("cx");
             this.animate({r: circle_radius, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
         }
-        var move = function (dx, dy) {
+        function move (dx, dy) {
             var x = this.ox + dx;
             var leftBound, rightBound, other;
             if (this == c0) {
@@ -98,15 +113,14 @@
             var d = Math.abs(x - other_x);
             var r = circle_radius;
             var overlapArea = areaOfIntersection(x, 0, r, other_x, 0, r);
-
-                    /*2 * (Math.pow(r, 2) * Math.acos(Math.pow(d, 2) / (2 * d * r)))
-                    - 0.5 * Math.sqrt((-d + r * 2) * (2 * d) * (d + 2 * r));*/
             var area = Math.PI * Math.pow(r, 2);
             var percentOverlap = Math.round(overlapArea / area * 10000) / 100;
             if (isNaN(percentOverlap)) percentOverlap = 100;
-            console.log(percentOverlap);
+
+            var qName = $$("#container").parent().attr("for");
+            $(qName).setValue(percentOverlap + "%");
         }
-        var up = function () {
+        function up () {
             this.animate({r: circle_radius, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
         }
         R.set(c0, c1).drag(move, start, up);
@@ -151,4 +165,3 @@
 </script>
 
 </body>
-</html>
