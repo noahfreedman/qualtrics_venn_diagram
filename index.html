@@ -5,7 +5,7 @@
         #container {
             position: relative;
             top: 0px;
-            border: 3px rgba(100, 100, 100, 0.6) solid;
+            border: 0px rgba(100, 100, 100, 0.6) solid;
             -webkit-border-radius: 10px;
             -moz-border-radius: 10px;
             border-radius: 10px;
@@ -22,6 +22,11 @@
 </head>
 <body>
 <div id="container"/>
+
+<p>
+    Percentage similarity:
+</p>
+
 <script type="text/javascript" >
 
     /* ========= VARIABLES ======== */
@@ -51,7 +56,7 @@
     venn.height = circle_radius * 2 + marginHeight;
 
     $$('#container').width(venn.width + "px");
-    $$('#container').height(venn.height + "px");
+    $$('#container').height((venn.height + 30) + "px");
 
     $$(document).ready(function () {
         //draw circles
@@ -114,11 +119,11 @@
             var r = circle_radius;
             var overlapArea = areaOfIntersection(x, 0, r, other_x, 0, r);
             var area = Math.PI * Math.pow(r, 2);
-            var percentOverlap = Math.round(overlapArea / area * 10000) / 100;
+            var percentOverlap = Math.round(overlapArea / area * 100);
             if (isNaN(percentOverlap)) percentOverlap = 100;
 
             var qName = $$("#container").parent().attr("for");
-            $(qName).setValue(percentOverlap + "%");
+            $(qName).setValue(percentOverlap);
         }
         function up () {
             this.animate({r: circle_radius, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
@@ -163,5 +168,4 @@
     });
 
 </script>
-
 </body>
