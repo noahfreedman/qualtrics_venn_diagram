@@ -26,6 +26,9 @@
 <body>
 <div id="container"/>
 <script>
+    var text1 = "African Americans";
+    var text2 = "Asian Americans";
+    var circle_radius = 150;
     //var $$ = $;
     //console.log($);
 </script>
@@ -40,11 +43,8 @@
     var venn = {};
     var marginHeight = 20;
 
-    var circle = {};
-    circle.r = 150;
-
-    venn.width = circle.r * 4;
-    venn.height = circle.r * 2 + marginHeight;
+    venn.width = circle_radius * 4;
+    venn.height = circle_radius * 2 + marginHeight;
 
     $$('#container').width(venn.width + "px");
     $$('#container').height(venn.height + "px");
@@ -53,28 +53,31 @@
         //draw circles
         var R = Raphael("container", venn.width, venn.height);
         var c = Raphael.getColor();
-        var c0 = R.circle(circle.r, venn.height / 2, circle.r).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+        var c0 = R.circle(circle_radius, venn.height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+        var t0 = R.text(circle_radius / 3, venn.height / 2, text1).attr({});
+        c0.text = t0;
 
         c = Raphael.getColor();
-        var c1 = R.circle(venn.width - circle.r, venn.height / 2, circle.r).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
-
+        var c1 = R.circle(venn.width - circle_radius, venn.height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+        var t1 = R.text(venn.width - circle_radius / 3, venn.height / 2, text2).attr({});
+        c1.text = t1;
 
         var start = function () {
             this.toFront();
             this.ox = this.attr("cx");
-            this.animate({r: circle.r, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
+            this.animate({r: circle_radius, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
         }
         var move = function (dx, dy) {
             var x = this.ox + dx;
             var leftBound, rightBound, other;
             if (this == c0) {
                 other = c1;
-                leftBound = circle.r;
+                leftBound = circle_radius;
                 rightBound = venn.width / 2;
             } else {
                 other = c0;
                 leftBound = venn.width / 2;
-                rightBound = venn.width - circle.r;
+                rightBound = venn.width - circle_radius;
             }
             //check bounds
             if (x > rightBound) {
@@ -83,12 +86,17 @@
                 x = leftBound;
             }
             var other_x = venn.width - x;
-
+            var dx = this.attr("cx") - x;
+            var tx = this.text.attr("x");
+            var other_dx = other.attr("cx") - other_x;
+            var other_tx = other.text.attr("x");
             this.attr({cx: x});
+            this.text.attr({x: tx - dx});
             other.attr({cx: other_x});
+            other.text.attr({x: other_tx - other_dx});
             //set value
             var d = Math.abs(x - other_x);
-            var r = circle.r;
+            var r = circle_radius;
             var overlapArea = areaOfIntersection(x, 0, r, other_x, 0, r);
 
                     /*2 * (Math.pow(r, 2) * Math.acos(Math.pow(d, 2) / (2 * d * r)))
@@ -99,7 +107,7 @@
             console.log(percentOverlap);
         }
         var up = function () {
-            this.animate({r: circle.r, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
+            this.animate({r: circle_radius, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
         }
         R.set(c0, c1).drag(move, start, up);
 
