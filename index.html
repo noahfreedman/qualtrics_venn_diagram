@@ -2,9 +2,9 @@
 
     /* ========= VARIABLES ======== */
 
-    var text1 = "African Americans";
-    var text2 = "Asian Americans";
-    var circle_radius = 150;
+    var LeftCircleText = "African Americans";
+    var RightCircleText = "Asian Americans";
+    var circle_radius_pixels = 150;
 
     /* =========-----------======== */
 
@@ -44,14 +44,17 @@
 </script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 <script type="text/javascript">
-
-    var venn = {};
-    var marginHeight = 20;
-
-    venn.width = circle_radius * 4;
-    venn.height = circle_radius * 2 + marginHeight;
-
     (function () {
+        var circle_radius = circle_radius_pixels;
+        var text1 = LeftCircleText;
+        var text2 = RightCircleText
+
+        var venn = {};
+        var marginHeight = 20;
+
+        venn.width = circle_radius * 4;
+        venn.height = circle_radius * 2 + marginHeight;
+
         var qName = $$(".container").first().parent().attr("for");
         var container = $$(".container").first();
 
