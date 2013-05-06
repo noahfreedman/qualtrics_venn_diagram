@@ -1,3 +1,40 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Venn Diagram for Qualtrics</title>
+    <style>
+        .circle {
+            width: 300px;
+            height: 300px;
+            padding: 10px 0px
+        }
+
+        #circle1 {
+            left: 500px;
+        }
+
+        #container {
+            position: relative;
+            top: 100px;
+            border: 3px rgba(100, 100, 100, 0.6) solid;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="container"/>
+<script>
+    /*SETTINGS=========== */
+    var text1 = "African Americans",
+            text2 = "Anglo-Saxon Americans";
+    /* ================= */
+
+    //var $$ = $;
+    //console.log($);
+=======
 <script type="text/javascript">
 
     /* ========= VARIABLES ======== */
@@ -35,6 +72,7 @@
 </p>
 <script type="text/javascript">
     var $$ = $;
+>>>>>>> non-draggable
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
@@ -48,8 +86,80 @@
     var venn = {};
     var marginHeight = 20;
 
+<<<<<<< HEAD
+    var circle = {};
+    circle.r = 150;
+
+    venn.width = circle.r * 4;
+    venn.height = circle.r * 2 + marginHeight;
+
+    $$('#container').width(venn.width + "px");
+    $$('#container').height(venn.height + "px");
+
+    $$(document).ready(function () {
+        //draw circles
+        var R = Raphael("container", venn.width, venn.height);
+        var c = Raphael.getColor();
+        var c0 = R.circle(circle.r, venn.height / 2, circle.r).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+        var t0 = R.text(circle.r, venn.height / 2, text1);
+        var g0 = R.set(c0, t0);
+        c0.set = g0, t0.set = g0;
+        initDraggableSet(g0);
+
+        c = Raphael.getColor();
+        var c1 = R.circle(venn.width - circle.r, venn.height / 2, circle.r).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+        var t1 = R.text(venn.width - circle.r, venn.height / 2, text2);
+        var g1 = R.set(c1, t1);
+        c1.set = g1, t1.set = g1;
+        initDraggableSet(g1);
+
+
+        function initDraggableSet(s) {
+           s.newTX=0,s.fDx=0,s.tAddX,s.reInitialize=false;
+
+        }
+
+
+        var start = function () {
+            this.toFront();
+            this.animate({r: circle.r, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
+        }
+        var move = function (dx, dy) {
+            var a = this.set;
+            a.tAddX=dx-a.fDx;
+            a.fDx=dx;
+            if(a.reInitialize)
+            {
+                a.tAddX=0,a.fDx=0,a.reInitialize=false;
+            }
+            else
+            {
+                a.newTX+=a.tAddX;
+                a.attr({transform: "t"+a.newTX+",0"});
+            }
+        }
+        var up = function () {
+            this.animate({r: circle.r, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
+            this.set.reInitialize=true;
+        }
+        R.set(c0, t0, c1, t1).drag(move, start, up);
+
+
+        function areaOfIntersection(x0, y0, r0, x1, y1, r1) {
+            //from http://stackoverflow.com/questions/4247889/area-of-intersection-between-two-circles
+            var rr0 = r0 * r0;
+            var rr1 = r1 * r1;
+            var d = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+
+            // Circles do not overlap
+            if (d > r1 + r0) {
+                return 0;
+            }
+=======
     venn.width = circle_radius * 4;
     venn.height = circle_radius * 2 + marginHeight;
+>>>>>>> non-draggable
+
 
     (function () {
         var qName = $$(".container").first().parent().attr("for");
