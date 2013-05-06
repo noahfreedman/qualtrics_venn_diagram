@@ -1,4 +1,14 @@
-<title>Venn Diagram for Qualtrics</title>
+<script type="text/javascript" >
+
+    /* ========= VARIABLES ======== */
+
+    var text1 = "African Americans";
+    var text2 = "Asian Americans";
+    var circle_radius = 150;
+
+    /* =========-----------======== */
+
+</script>
 <style>
     #container {
         position: relative;
@@ -8,7 +18,6 @@
         -moz-border-radius: 10px;
         border-radius: 10px;
     }
-
     .noselect {
         -webkit-user-select: none;
         -khtml-user-select: none;
@@ -24,22 +33,11 @@
     Percentage similarity:
 </p>
 
-<script type="text/javascript">
-
-    /* ========= VARIABLES ======== */
-
-    var text1 = "African Americans";
-    var text2 = "Asian Americans";
-    var circle_radius = 150;
-
-    /* =========-----------======== */
-
-</script>
-<script type="text/javascript">
+<script type="text/javascript" >
     var $$ = $;
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" >
     var jQuery = $;
     $ = $$;
     $$ = jQuery;
@@ -52,18 +50,19 @@
     venn.width = circle_radius * 4;
     venn.height = circle_radius * 2 + marginHeight;
 
+
     var qName = $$("#container").parent().attr("for");
-    var container = $$("#container");
+    $$('#container').attr('id', qName);
 
-    var cont_name = "container_" + qName;
-    container.attr("id", cont_name);
+    var container = $$("#" + qName);
 
-    container.width(venn.width + "px");
+
+    $$('#" + qName').width(venn.width + "px");
     container.height((venn.height + 30) + "px");
 
     $$(document).ready(function () {
         //draw circles
-        var R = Raphael(cont_name, venn.width, venn.height);
+        var R = Raphael(qName, venn.width, venn.height);
         var c = Raphael.getColor();
         var c0 = R.circle(circle_radius, venn.height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
         var t0 = R.text(circle_radius / 3, venn.height / 2, text1).attr({});
@@ -75,7 +74,8 @@
         c1.text = t1;
 
         $$('text').addClass("noselect");
-        container.parent().addClass("noselect");
+       container.parent().addClass("noselect");
+
         $$($(qName)).addClass("noselect");
 
         //move to random position
@@ -84,13 +84,12 @@
         move.apply(c0, [pos, 0]);
         up.apply(c0);
 
-        function start() {
+       function start () {
             this.toFront();
             this.ox = this.attr("cx");
             this.animate({r: circle_radius, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
         }
-
-        function move(dx, dy) {
+        function move (dx, dy) {
             var x = this.ox + dx;
             var leftBound, rightBound, other;
             if (this == c0) {
@@ -127,11 +126,9 @@
 
             $(qName).setValue(percentOverlap);
         }
-
-        function up() {
+        function up () {
             this.animate({r: circle_radius, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
         }
-
         R.set(c0, c1).drag(move, start, up);
 
 
