@@ -7,7 +7,10 @@ License: The Venn Diagram plug-in for Qualtrics  is free software: you can redis
 
     The Venn Diagram plug-in for Qualtrics is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
     
+
 Author: Noah Freedman
+
+Sponsored by: Stanford University Graduate School of Education
 
 Demo:
 
