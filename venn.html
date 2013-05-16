@@ -12,6 +12,8 @@ var hideInputField = false; //set to true or false, no quotes
 
 var circle_radius_pixels = 150;
 
+var randomized - false;
+
 /* =========-----------======== */
 
 </script>
@@ -94,8 +96,8 @@ var circle_radius_pixels = 150;
             $$($(qName)).addClass("noselect");
             $$($(qName)).css("visibility", hideInput ? "hidden" : "visibile");
 
-            //move to random position
-            var pos = Math.random() * (venn.width / 2 - circle_radius);
+            //move to random position if randomized is true
+            var pos = randomized ? Math.random() * (venn.width / 2 - circle_radius) : 0;
             start.apply(c0);
             move.apply(c0, [pos, 0]);
             up.apply(c0);
