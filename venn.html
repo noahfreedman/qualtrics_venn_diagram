@@ -39,11 +39,13 @@ var randomized = false;
 <div class="container"/>
 
 <script type="text/javascript">
+    //Preserve the $ object being used by Qualtrics
     var $$ = $;
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
     var jQuery = $;
+    //Don't override the global $ variable that Qualitrics is using, use $$ to refer jQuery 
     $ = $$;
     $$ = jQuery;
 </script>
