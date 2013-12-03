@@ -1,35 +1,7 @@
 <!--Write your question text here, and set options below:-->
 What percentage of DNA do humans and frogs share in common?
 <!-- -->
-<script type="text/javascript">
 
-/* ========= OPTIONS ======== */
-
-var LeftCircleText = "Humans";
-var RightCircleText = "Frogs";
-
-var hideInputField = false; //set to true or false, no quotes.
-        //If true, the user will not be able to see the number value
-        //that represents the area of overlap between the two circles.
-
-var circle_radius_pixels = 150;
-
-var randomColors = false; 
-var leftColors = ["#345654"]; 
-var rightColors = ["#sdf4g3h"];
-
-var lockToIntervals = true;
-var intervals = 10;
-
-var randomizedStartPosition = false; //Start circles with random start position?
-
-var useAreaOfIntersection = false; //If set to true, then the value returned 
-    //to represent overlap will represent the percent of the two circles area 
-    //that is overlapping. Otherwise, the returned value will represent the
-    //linear a linear scale indicating how close the radii of the circles are (from 0 - 100)
-/* =========-----------======== */
-
-</script>
 <style>
     #container {
         position: relative;
@@ -53,28 +25,63 @@ var useAreaOfIntersection = false; //If set to true, then the value returned
 
 <script type="text/javascript">
     //Preserve the $ object being used by Qualtrics
-    //DEV//var $$ = $;
+    var $$ = $;
 </script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
     var jQuery = $;
-    //Don't override the global $ variable that Qualitrics is using, use $$ to refer jQuery 
-    //DEV//$ = $$;
+    //Don't override the global $ variable that Qualtrics is using, use $$ to refer jQuery
+    $ = $$;
     $$ = jQuery;
 </script>
 <script type="text/javascript" src="//smile.stanford.edu/noah/raphael_2_1_dragFix.min.js"></script>
 <script type="text/javascript">
     (function () {
+
+
+/* ======================== OPTIONS ============================ */
+
+
+
+        var LeftCircleText = "Humans";
+        var RightCircleText = "Frogs";
+
+        var hideInputField = false; //set to true or false, no quotes.
+        //If true, the user will not be able to see the number value
+        //that represents the area of overlap between the two circles.
+
+        var circle_radius_pixels = 150;
+
+        var randomColors = false;
+
+        //hexadecimal color values using this format: "000000"
+        var leftColor = "17316C";
+        var rightColor = "00FF00";
+
+        var lockToIntervals = false;
+        var numIntervals = 5; //5 intervals really means 5 intervals plus 0, i.e. 0,20,40,60,80,100
+
+        var randomizedStartPosition = false; //Start circles with random start position?
+
+        var useAreaOfIntersection = false; //If set to true, then the value returned
+        //to represent overlap will represent the percent of one of the circle's area
+        //that is overlapping. Otherwise, the returned value will represent the
+        //linear a linear scale indicating how close the radii of the circles are (from 0 - 100)
+
+
+
+/* ======================== END of OPTIONS ===================== */
+
+
         var circle_radius = circle_radius_pixels;
         var text1 = LeftCircleText;
         var text2 = RightCircleText;
-        var hideInput = hideInputField;
+        var hideInput = hideInput = hideInputField;
 
-        var venn = {};
         var marginHeight = 20;
 
-        venn.width = circle_radius * 4;
-        venn.height = circle_radius * 2 + marginHeight;
+        var width = circle_radius * 4;
+        var height = circle_radius * 2 + marginHeight;
 
         var qName = $$(".container").first().parent().attr("for");
         var container = $$(".container").first();
@@ -89,21 +96,40 @@ var useAreaOfIntersection = false; //If set to true, then the value returned
         var cont_name = "container_" + qName;
         container.attr("id", cont_name);
 
-        container.width(venn.width + "px");
-        container.height((venn.height + 30) + "px");
+        container.width(width + "px");
+        container.height((height + 30) + "px");
+
+        //define getColor()
+        //set one of left/right colors to the other color if one is missing
+        if (leftColor || rightColor) {
+            leftColor = leftColor || rightColor;
+            rightColor = rightColor || leftColor;
+        }
+        var getColor;
+        if (!randomColors && leftColor && rightColor) {
+            getColor = function(color) {
+                if (color.substring(0, 1) != "#") color = "#" + color;
+                return color;
+            }
+        } else {
+            getColor = function() {
+                return Raphael.getColor();
+            };
+        }
 
         $$(document).ready(function () {
 
             //draw circles
-            var R = Raphael(cont_name, venn.width, venn.height);
-            var c = Raphael.getColor();
-            var c0 = R.circle(circle_radius, venn.height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
-            var t0 = R.text(circle_radius / 3, venn.height / 2, text1);
+            var R = Raphael(cont_name, width, height);
+
+            var c = getColor(leftColor);
+            var c0 = R.circle(circle_radius, height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+            var t0 = R.text(circle_radius / 3, height / 2, text1);
             c0.text = t0;
 
-            c = Raphael.getColor();
-            var c1 = R.circle(venn.width - circle_radius, venn.height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
-            var t1 = R.text(venn.width - circle_radius / 3, venn.height / 2, text2);
+            c = getColor(rightColor);
+            var c1 = R.circle(width - circle_radius, height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+            var t1 = R.text(width - circle_radius / 3, height / 2, text2);
             c1.text = t1;
 
             $$('text').addClass("noselect");
@@ -112,7 +138,7 @@ var useAreaOfIntersection = false; //If set to true, then the value returned
             $$($(qName)).css("visibility", hideInput ? "hidden" : "visibile");
 
             //move to random position if randomizedStartPosition is true
-            var pos = randomizedStartPosition ? Math.random() * (venn.width / 2 - circle_radius) : 0;
+            var pos = randomizedStartPosition ? Math.random() * (width / 2 - circle_radius) : 0;
             start.apply(c0);
             move.apply(c0, [pos, 0]);
             up.apply(c0);
@@ -129,11 +155,11 @@ var useAreaOfIntersection = false; //If set to true, then the value returned
                 if (this == c0) {
                     other = c1;
                     leftBound = circle_radius;
-                    rightBound = venn.width / 2;
+                    rightBound = width / 2;
                 } else {
                     other = c0;
-                    leftBound = venn.width / 2;
-                    rightBound = venn.width - circle_radius;
+                    leftBound = width / 2;
+                    rightBound = width - circle_radius;
                 }
                 //check bounds
                 if (x > rightBound) {
@@ -141,29 +167,32 @@ var useAreaOfIntersection = false; //If set to true, then the value returned
                 } else if (x < leftBound) {
                     x = leftBound;
                 }
-                var other_x = venn.width - x;
+                if (lockToIntervals) {
+                    x = Math.round(x * numIntervals / (circle_radius_pixels)) * circle_radius_pixels / numIntervals;
+                }
+                var other_x = width - x;
                 var dx = this.attr("cx") - x;
                 var tx = this.text.attr("x");
                 var other_dx = other.attr("cx") - other_x;
                 var other_tx = other.text.attr("x");
+
                 this.attr({cx: x});
                 this.text.attr({x: tx - dx});
                 other.attr({cx: other_x});
                 other.text.attr({x: other_tx - other_dx});
 
+                //set value
+                var d = Math.abs(x - other_x);
+                var r = circle_radius;
                 if (useAreaOfIntersection) {
-                    //set value
-                    var d = Math.abs(x - other_x);
-                    var r = circle_radius;
                     var overlapArea = areaOfIntersection(x, 0, r, other_x, 0, r);
                     var area = Math.PI * Math.pow(r, 2);
                     var percentOverlap = Math.round(overlapArea / area * 100);
                     if (isNaN(percentOverlap)) percentOverlap = 100;
                 } else {
-                    percentOverlap = areaOfIntersection();
+                    percentOverlap = Math.round(d / circle_radius_pixels * 50);
                 }
-                //DEV//$(qName).setValue(percentOverlap);
-                console.log(percentOverlap);
+                $(qName).setValue(percentOverlap);
             }
 
             function up() {
