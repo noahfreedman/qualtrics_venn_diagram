@@ -3,15 +3,6 @@ What percentage of DNA do humans and frogs share in common?
 <!-- -->
 
 <style>
-    #container {
-        position: relative;
-        top: 0px;
-        border: 0px rgba(100, 100, 100, 0.6) solid;
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        border-radius: 10px;
-    }
-
     .noselect {
         -webkit-user-select: none;
         -khtml-user-select: none;
@@ -22,221 +13,209 @@ What percentage of DNA do humans and frogs share in common?
     }
 </style>
 <div class="container"/>
-
-<script type="text/javascript">
-    //Preserve the $ object being used by Qualtrics
-    var $$ = $;
-</script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type="text/javascript">
-    var jQuery = $;
-    //Don't override the global $ variable that Qualtrics is using, use $$ to refer jQuery
-    $ = $$;
-    $$ = jQuery;
-</script>
 <script type="text/javascript" src="//smile.stanford.edu/noah/raphael_2_1_dragFix.min.js"></script>
 <script type="text/javascript">
-    (function () {
+(function () {
+    jQuery.noConflict();
 
+    /* ======================== OPTIONS ============================ */
 
-/* ======================== OPTIONS ============================ */
+    var LeftCircleText = "Humans";
+    var RightCircleText = "Frogs";
 
+    var hideInputField = true; //set to true or false, no quotes.
+    //If true, the user will not be able to see the number value
+    //that represents the area of overlap between the two circles.
 
+    var circle_radius_pixels = 150;
 
-        var LeftCircleText = "Humans";
-        var RightCircleText = "Frogs";
+    var randomColors = false;
 
-        var hideInputField = false; //set to true or false, no quotes.
-        //If true, the user will not be able to see the number value
-        //that represents the area of overlap between the two circles.
+    //hexadecimal color values using this format: "000000"
+    var leftColor = "17316C";
+    var rightColor = "00FF00";
 
-        var circle_radius_pixels = 150;
+    var lockToIntervals = false;
+    var numIntervals = 5; //5 intervals really means 5 intervals plus 0, i.e. 0,20,40,60,80,100
 
-        var randomColors = false;
+    var randomizedStartPosition = false; //Start circles with random start position?
 
-        //hexadecimal color values using this format: "000000"
-        var leftColor = "17316C";
-        var rightColor = "00FF00";
-
-        var lockToIntervals = false;
-        var numIntervals = 5; //5 intervals really means 5 intervals plus 0, i.e. 0,20,40,60,80,100
-
-        var randomizedStartPosition = false; //Start circles with random start position?
-
-        var useAreaOfIntersection = false; //If set to true, then the value returned
-        //to represent overlap will represent the percent of one of the circle's area
-        //that is overlapping. Otherwise, the returned value will represent the
-        //linear a linear scale indicating how close the radii of the circles are (from 0 - 100)
+    var useAreaOfIntersection = false; //If set to true, then the value returned
+    //to represent overlap will represent the percent of one of the circle's area
+    //that is overlapping. Otherwise, the returned value will represent the
+    //linear a linear scale indicating how close the radii of the circles are (from 0 - 100)
 
 
 
-/* ======================== END of OPTIONS ===================== */
+    /* ======================== END of OPTIONS ===================== */
 
 
-        var circle_radius = circle_radius_pixels;
-        var text1 = LeftCircleText;
-        var text2 = RightCircleText;
-        var hideInput = hideInput = hideInputField;
+    var circle_radius = circle_radius_pixels;
+    var text1 = LeftCircleText;
+    var text2 = RightCircleText;
+    var hideInput = hideInput = hideInputField;
 
-        var marginHeight = 20;
+    var marginHeight = 20;
 
-        var width = circle_radius * 4;
-        var height = circle_radius * 2 + marginHeight;
+    var width = circle_radius * 4;
+    var height = circle_radius * 2 + marginHeight;
 
-        var qName = $$(".container").first().parent().attr("for");
-        var container = $$(".container").first();
+
+    //define getColor()
+    //set one of left/right colors to the other color if one is missing
+    if (leftColor || rightColor) {
+        leftColor = leftColor || rightColor;
+        rightColor = rightColor || leftColor;
+    }
+    var getColor;
+    if (!randomColors && leftColor && rightColor) {
+        getColor = function(color) {
+            if (color.substring(0, 1) != "#") color = "#" + color;
+            return color;
+        }
+    } else {
+        getColor = function() {
+            return Raphael.getColor();
+        };
+    }
+
+    Qualtrics.SurveyEngine.addOnload(function ()
+    {
+
+        var qName = this.questionId;
+        var responseFieldId = "QR~" + qName;
+        var container = jQuery(this.questionContainer).find('.container')[0];
+        var input =  jQuery('#' + qName).find('.InputText')[0];
+
+        console.log(responseFieldId);
 
         if (!hideInput) {
             var tt = "<p>Percentage similarity:</p>";
-            container.parent().append(tt);
+            jQuery(container).parent().append(tt);
         }
 
-        container.removeClass("container");
+        jQuery(container).width(width + "px");
+        jQuery(container).height((height + 30) + "px");
 
-        var cont_name = "container_" + qName;
-        container.attr("id", cont_name);
+        //draw circles
+        var R = Raphael(container, width, height);
 
-        container.width(width + "px");
-        container.height((height + 30) + "px");
+        var c = getColor(leftColor);
+        var c0 = R.circle(circle_radius, height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+        var t0 = R.text(circle_radius / 3, height / 2, text1);
+        c0.text = t0;
 
-        //define getColor()
-        //set one of left/right colors to the other color if one is missing
-        if (leftColor || rightColor) {
-            leftColor = leftColor || rightColor;
-            rightColor = rightColor || leftColor;
+        c = getColor(rightColor);
+        var c1 = R.circle(width - circle_radius, height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
+        var t1 = R.text(width - circle_radius / 3, height / 2, text2);
+        c1.text = t1;
+
+        jQuery('text').addClass("noselect");
+        jQuery(container).parent().addClass("noselect");
+        jQuery("#" + qName).addClass("noselect");
+        jQuery(input).css("visibility", hideInput ? "hidden" : "visibile");
+        jQuery(input).attr('readonly', true);
+
+        //move to random position if randomizedStartPosition is true
+        var pos = randomizedStartPosition ? Math.random() * (width / 2 - circle_radius) : 0;
+        start.apply(c0);
+        move.apply(c0, [pos, 0]);
+        up.apply(c0);
+
+        R.set(c0, c1).drag(move, start, up);
+        
+        function start() {
+            this.toFront();
+            this.ox = this.attr("cx");
+            this.animate({r: circle_radius, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
         }
-        var getColor;
-        if (!randomColors && leftColor && rightColor) {
-            getColor = function(color) {
-                if (color.substring(0, 1) != "#") color = "#" + color;
-                return color;
+
+        function move(dx, dy) {
+            var x = this.ox + dx;
+            var leftBound, rightBound, other;
+            if (this == c0) {
+                other = c1;
+                leftBound = circle_radius;
+                rightBound = width / 2;
+            } else {
+                other = c0;
+                leftBound = width / 2;
+                rightBound = width - circle_radius;
             }
-        } else {
-            getColor = function() {
-                return Raphael.getColor();
-            };
+            //check bounds
+            if (x > rightBound) {
+                x = rightBound;
+            } else if (x < leftBound) {
+                x = leftBound;
+            }
+            if (lockToIntervals) {
+                x = Math.round(x * numIntervals / (circle_radius_pixels)) * circle_radius_pixels / numIntervals;
+            }
+            var other_x = width - x;
+            var dx = this.attr("cx") - x;
+            var tx = this.text.attr("x");
+            var other_dx = other.attr("cx") - other_x;
+            var other_tx = other.text.attr("x");
+
+            this.attr({cx: x});
+            this.text.attr({x: tx - dx});
+            other.attr({cx: other_x});
+            other.text.attr({x: other_tx - other_dx});
+
+            //set value
+            var d = Math.abs(x - other_x);
+            var r = circle_radius;
+            if (useAreaOfIntersection) {
+                var overlapArea = areaOfIntersection(x, 0, r, other_x, 0, r);
+                var area = Math.PI * Math.pow(r, 2);
+                var percentOverlap = Math.round(overlapArea / area * 100);
+                if (isNaN(percentOverlap)) percentOverlap = 100;
+            } else {
+                percentOverlap = Math.round(d / circle_radius_pixels * 50);
+            }
+            input.setValue(percentOverlap);
         }
 
-        $$(document).ready(function () {
+        function up() {
+            this.animate({r: circle_radius, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
+        }
 
-            //draw circles
-            var R = Raphael(cont_name, width, height);
+        function areaOfIntersection(x0, y0, r0, x1, y1, r1) {
+            //from http://stackoverflow.com/questions/4247889/area-of-intersection-between-two-circles
+            var rr0 = r0 * r0;
+            var rr1 = r1 * r1;
+            var d = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
 
-            var c = getColor(leftColor);
-            var c0 = R.circle(circle_radius, height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
-            var t0 = R.text(circle_radius / 3, height / 2, text1);
-            c0.text = t0;
-
-            c = getColor(rightColor);
-            var c1 = R.circle(width - circle_radius, height / 2, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": .4, "stroke-opacity": 0.8});
-            var t1 = R.text(width - circle_radius / 3, height / 2, text2);
-            c1.text = t1;
-
-            $$('text').addClass("noselect");
-            container.parent().addClass("noselect");
-            $$($(qName)).addClass("noselect");
-            $$($(qName)).css("visibility", hideInput ? "hidden" : "visibile");
-
-            //move to random position if randomizedStartPosition is true
-            var pos = randomizedStartPosition ? Math.random() * (width / 2 - circle_radius) : 0;
-            start.apply(c0);
-            move.apply(c0, [pos, 0]);
-            up.apply(c0);
-
-            function start() {
-                this.toFront();
-                this.ox = this.attr("cx");
-                this.animate({r: circle_radius, "fill-opacity": .6, "stroke-width": 5}, 500, ">");
+            // Circles do not overlap
+            if (d > r1 + r0) {
+                return 0;
             }
 
-            function move(dx, dy) {
-                var x = this.ox + dx;
-                var leftBound, rightBound, other;
-                if (this == c0) {
-                    other = c1;
-                    leftBound = circle_radius;
-                    rightBound = width / 2;
-                } else {
-                    other = c0;
-                    leftBound = width / 2;
-                    rightBound = width - circle_radius;
-                }
-                //check bounds
-                if (x > rightBound) {
-                    x = rightBound;
-                } else if (x < leftBound) {
-                    x = leftBound;
-                }
-                if (lockToIntervals) {
-                    x = Math.round(x * numIntervals / (circle_radius_pixels)) * circle_radius_pixels / numIntervals;
-                }
-                var other_x = width - x;
-                var dx = this.attr("cx") - x;
-                var tx = this.text.attr("x");
-                var other_dx = other.attr("cx") - other_x;
-                var other_tx = other.text.attr("x");
-
-                this.attr({cx: x});
-                this.text.attr({x: tx - dx});
-                other.attr({cx: other_x});
-                other.text.attr({x: other_tx - other_dx});
-
-                //set value
-                var d = Math.abs(x - other_x);
-                var r = circle_radius;
-                if (useAreaOfIntersection) {
-                    var overlapArea = areaOfIntersection(x, 0, r, other_x, 0, r);
-                    var area = Math.PI * Math.pow(r, 2);
-                    var percentOverlap = Math.round(overlapArea / area * 100);
-                    if (isNaN(percentOverlap)) percentOverlap = 100;
-                } else {
-                    percentOverlap = Math.round(d / circle_radius_pixels * 50);
-                }
-                $(qName).setValue(percentOverlap);
+            // Circle1 is completely inside circle0
+            else if (d <= Math.abs(r0 - r1) && r0 >= r1) {
+                // Return area of circle1
+                return Math.PI * rr1;
             }
 
-            function up() {
-                this.animate({r: circle_radius, "fill-opacity": .4, "stroke-width": 0}, 500, ">");
+            // Circle0 is completely inside circle1
+            else if (d <= Math.abs(r0 - r1) && r0 < r1) {
+                // Return area of circle0
+                return Math.PI * rr0;
             }
 
-            R.set(c0, c1).drag(move, start, up);
+            // Circles partially overlap
+            else {
+                var phi = (Math.acos((rr0 + (d * d) - rr1) / (2 * r0 * d))) * 2;
+                var theta = (Math.acos((rr1 + (d * d) - rr0) / (2 * r1 * d))) * 2;
+                var area1 = 0.5 * theta * rr1 - 0.5 * rr1 * Math.sin(theta);
+                var area2 = 0.5 * phi * rr0 - 0.5 * rr0 * Math.sin(phi);
 
-
-            function areaOfIntersection(x0, y0, r0, x1, y1, r1) {
-                //from http://stackoverflow.com/questions/4247889/area-of-intersection-between-two-circles
-                var rr0 = r0 * r0;
-                var rr1 = r1 * r1;
-                var d = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-
-                // Circles do not overlap
-                if (d > r1 + r0) {
-                    return 0;
-                }
-
-                // Circle1 is completely inside circle0
-                else if (d <= Math.abs(r0 - r1) && r0 >= r1) {
-                    // Return area of circle1
-                    return Math.PI * rr1;
-                }
-
-                // Circle0 is completely inside circle1
-                else if (d <= Math.abs(r0 - r1) && r0 < r1) {
-                    // Return area of circle0
-                    return Math.PI * rr0;
-                }
-
-                // Circles partially overlap
-                else {
-                    var phi = (Math.acos((rr0 + (d * d) - rr1) / (2 * r0 * d))) * 2;
-                    var theta = (Math.acos((rr1 + (d * d) - rr0) / (2 * r1 * d))) * 2;
-                    var area1 = 0.5 * theta * rr1 - 0.5 * rr1 * Math.sin(theta);
-                    var area2 = 0.5 * phi * rr0 - 0.5 * rr0 * Math.sin(phi);
-
-                    // Return area of intersection
-                    return area1 + area2;
-                }
+                // Return area of intersection
+                return area1 + area2;
             }
-        });
-    })();
+        }
+    });
+})();
 
 </script>
