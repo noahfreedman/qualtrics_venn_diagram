@@ -1,0 +1,121 @@
+<!--Write your question text here, and set options below:-->
+How much in group variation is there?
+<!-- -->
+
+<style>
+    #container {
+        position: relative;
+        top: 0px;
+        border: 0px rgba(100, 100, 100, 0.6) solid;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+    }
+
+    .noselect {
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+    }
+</style>
+<div class="container"></div>
+
+<script type="text/javascript">
+    //Preserve the $ object being used by Qualtrics
+    /*DEV*/var $$ = $;
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+    var jQuery = $;
+    //Don't override the global $ variable that Qualtrics is using, use $$ to refer jQuery
+    /*DEV*/$ = $$;
+    $$ = jQuery;
+</script>
+<script type="text/javascript" src="//smile.stanford.edu/noah/raphael_2_1_dragFix.min.js"></script>
+<script type="text/javascript">
+    (function () {
+
+
+        /* ======================== OPTIONS ============================ */
+
+        var hideInputField = false; //set to true or false, no quotes.
+        //If true, the user will not be able to see the number value
+        //that represents the area of overlap between the two circles.
+
+        var circle_radius_pixels = 16;
+        //grid size for pattern of circles
+        var rows = 9;
+        var columns = 9;
+
+        //hexadecimal color values using this format: "000000"
+        var color1 = "228DFF";
+        var color2 = "FF0092";
+
+//
+        /* ======================== END of OPTIONS ===================== */
+
+        var circles = [];
+        var R; //will hold Raphael object;
+
+        color1 = Raphael.getRGB(color1);
+        color2 = Raphael.getRGB(color2);
+
+        var circle_radius = circle_radius_pixels;
+        var hideInput = hideInputField;
+
+        var marginRight = 2;
+        var marginBottom = 2;
+
+        var width = (circle_radius * 2 + marginRight) * columns - marginRight;
+        var height = (circle_radius * 2 + marginBottom) * rows - marginBottom;
+
+
+        var drawCircles = function (variation, min, max) {
+            //normalize variation from a 0 - 1 scale. 0 means all the same, 1 is random colors with no damping effect
+            var variation = (variation - min) / max;
+            //draw circles by row and column
+            for (var i = 0; i < rows; i++) {
+                for (var ii = 0; ii < columns; ii++) {
+                    var weightB = (Math.random() * variation); //how much to weightB, degree of mutation
+                    weightB = (Math.random() < variation) ? weightB : 0 ; //filter for likelihood of mutation
+                    var c = combine(color1, color2, weightB);
+                    c = Raphael.rgb(c.r, c.g, c.b);
+                    var x = ii * (circle_radius * 2 + marginRight) + circle_radius;
+                    var y = i * (circle_radius * 2 + marginBottom) + circle_radius;
+                    var circle = R.circle(x, y, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": 1, "stroke-opacity": 0.8});
+                    circles.push(circle);
+                }
+            }
+        }
+
+        var combine = function (a, b, weightB) {
+            if (weightB < 0) weightB = 0;
+            var c = {
+                r: a.r,
+                g: a.g,
+                b: a.b
+            };
+
+            c.r = ((a.r * (1 - weightB)) + (b.r * weightB));
+            c.g = ((a.g * (1 - weightB)) + (b.g * weightB));
+            c.b = ((a.b * (1 - weightB)) + (b.b * weightB));
+
+            return c;
+        };
+
+        Qualtrics.SurveyEngine.addOnload(function ()
+        {
+            console.log(this);
+            console.log(this.questionContainer);
+
+            window.aa = this.questionContainer;
+
+            //$$('[id$="~QuestionID"]').parent().find(".container")
+            return;
+        });
+    })();
+
+</script>
