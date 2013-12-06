@@ -11,8 +11,11 @@ Which graphic representation best matches how much in-group variation you think 
         -o-user-select: none;
         user-select: none;
     }
+    .variance_container {
+        margin: 20px;
+    }
 </style>
-<div class="container"></div>
+<div class="variance_container"></div>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript" src="//smile.stanford.edu/noah/raphael_2_1_dragFix.min.js"></script>
@@ -41,9 +44,6 @@ Which graphic representation best matches how much in-group variation you think 
         var circles = [];
         var R; //will hold Raphael object;
 
-        console.log(Raphael);
-        window.r = Raphael;
-
         color1 = Raphael.getRGB(color1);
         color2 = Raphael.getRGB(color2);
 
@@ -58,6 +58,8 @@ Which graphic representation best matches how much in-group variation you think 
 
         //variable to hold Raphael instance
         var R;
+        var timeout = 1000; //length of time to allow slider elements to load
+                            //TODO: replace with a load event for scripts they contain
 
         var qName;
         var choice;
@@ -67,20 +69,8 @@ Which graphic representation best matches how much in-group variation you think 
             //load data from Qualtrics API, which sets 'this'
             qName = this.questionId;
             choice = this.getChoices()[0];
-            var sliderId = qName + "~" + choice + "~handle";
-            var slider = jQuery('#' + sliderId);
-            var trackId = qName + "~" + choice + "~track";
-            var track = jQuery('#' + track);
-            var container = jQuery(this.questionContainer).find('.container')[0];
 
-            //var container = jQuery(".container").first();
-            console.log(container);
-            console.log(slider);
-
-            window.s = slider;
-
-            window.c = container;
-            window.a = this;
+            var container = jQuery(this.questionContainer).find('.variance_container')[0];
 
             jQuery(container).width(width + "px");
             jQuery(container).height((height) + "px");
@@ -88,13 +78,36 @@ Which graphic representation best matches how much in-group variation you think 
             //draw stage
             R = Raphael(container, width, height);
 
-            drawCircles(69, 0, 100);
+            var oldPos;
+            setTimeout(function() {
+                //bind handle to set value function
+                var sliderId = qName + "\\~" + choice + "\\~handle";
+                var slider = jQuery('#' + sliderId);
 
-            return;
+                var trackId = qName + "\\~" + choice + "\\~track";
+                var track = jQuery('#' + trackId);
+
+                var qDiv = jQuery("#" + qName);
+                var trackWidth = track.width() - slider.width();
+
+                //draw initial render based on initial slider position
+                var pos = oldPos = parseFloat(slider.css("left"));
+                drawCircles(pos, 0, trackWidth);
+                qDiv.mousemove(function(obj) {
+                    var pos = parseFloat(slider.css("left"));
+                    if (pos !== oldPos) {
+                        oldPos = pos;
+                        drawCircles(pos, 0, trackWidth);
+                    }
+                })
+
+            }, 1000);
         });
 
 
         function drawCircles(variation, min, max) {
+            //clear Raphael paper
+            R.clear();
             //normalize variation from a 0 - 1 scale. 0 means all the same, 1 is random colors with no damping effect
             var variation = (variation - min) / max;
             //draw circles by row and column
@@ -106,7 +119,7 @@ Which graphic representation best matches how much in-group variation you think 
                     c = Raphael.rgb(c.r, c.g, c.b);
                     var x = ii * (circle_radius * 2 + marginRight) + circle_radius;
                     var y = i * (circle_radius * 2 + marginBottom) + circle_radius;
-                    var circle = R.circle(x, y, circle_radius).attr({stroke: c, "stroke-width": 0, fill: c, "fill-opacity": 1, "stroke-opacity": 0.8});
+                    var circle = R.circle(x, y, circle_radius).attr({fill: c, stroke: "none"});
                     circles.push(circle);
                 }
             }
@@ -114,6 +127,7 @@ Which graphic representation best matches how much in-group variation you think 
 
         //draw circles
         function drawRecursive(num) {
+            //first remove old objects
             if (num > 0) {
                 num--;
                 drawCircles(100 - num, 0, 100);
