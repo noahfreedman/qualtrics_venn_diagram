@@ -1,17 +1,8 @@
 <!--Write your question text here, and set options below:-->
-How much in group variation is there?
+Which graphic representation best matches how much in-group variation you think there is?
 <!-- -->
 
 <style>
-    #container {
-        position: relative;
-        top: 0px;
-        border: 0px rgba(100, 100, 100, 0.6) solid;
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        border-radius: 10px;
-    }
-
     .noselect {
         -webkit-user-select: none;
         -khtml-user-select: none;
@@ -23,21 +14,11 @@ How much in group variation is there?
 </style>
 <div class="container"></div>
 
-<script type="text/javascript">
-    //Preserve the $ object being used by Qualtrics
-    /*DEV*/var $$ = $;
-</script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type="text/javascript">
-    var jQuery = $;
-    //Don't override the global $ variable that Qualtrics is using, use $$ to refer jQuery
-    /*DEV*/$ = $$;
-    $$ = jQuery;
-</script>
 <script type="text/javascript" src="//smile.stanford.edu/noah/raphael_2_1_dragFix.min.js"></script>
 <script type="text/javascript">
     (function () {
-
+        jQuery.noConflict();
 
         /* ======================== OPTIONS ============================ */
 
@@ -50,15 +31,18 @@ How much in group variation is there?
         var rows = 9;
         var columns = 9;
 
-        //hexadecimal color values using this format: "000000"
-        var color1 = "228DFF";
-        var color2 = "FF0092";
+        //hexadecimal color values using this format: "#000000"
+        var color1 = "#228DFF";
+        var color2 = "#FF0092";
 
 //
         /* ======================== END of OPTIONS ===================== */
 
         var circles = [];
         var R; //will hold Raphael object;
+
+        console.log(Raphael);
+        window.r = Raphael;
 
         color1 = Raphael.getRGB(color1);
         color2 = Raphael.getRGB(color2);
@@ -72,8 +56,45 @@ How much in group variation is there?
         var width = (circle_radius * 2 + marginRight) * columns - marginRight;
         var height = (circle_radius * 2 + marginBottom) * rows - marginBottom;
 
+        //variable to hold Raphael instance
+        var R;
 
-        var drawCircles = function (variation, min, max) {
+        var qName;
+        var choice;
+
+        Qualtrics.SurveyEngine.addOnload(function ()
+        {
+            //load data from Qualtrics API, which sets 'this'
+            qName = this.questionId;
+            choice = this.getChoices()[0];
+            var sliderId = qName + "~" + choice + "~handle";
+            var slider = jQuery('#' + sliderId);
+            var trackId = qName + "~" + choice + "~track";
+            var track = jQuery('#' + track);
+            var container = jQuery(this.questionContainer).find('.container')[0];
+
+            //var container = jQuery(".container").first();
+            console.log(container);
+            console.log(slider);
+
+            window.s = slider;
+
+            window.c = container;
+            window.a = this;
+
+            jQuery(container).width(width + "px");
+            jQuery(container).height((height) + "px");
+
+            //draw stage
+            R = Raphael(container, width, height);
+
+            drawCircles(69, 0, 100);
+
+            return;
+        });
+
+
+        function drawCircles(variation, min, max) {
             //normalize variation from a 0 - 1 scale. 0 means all the same, 1 is random colors with no damping effect
             var variation = (variation - min) / max;
             //draw circles by row and column
@@ -91,7 +112,18 @@ How much in group variation is there?
             }
         }
 
-        var combine = function (a, b, weightB) {
+        //draw circles
+        function drawRecursive(num) {
+            if (num > 0) {
+                num--;
+                drawCircles(100 - num, 0, 100);
+                setTimeout(function() {
+                    drawRecursive(num);
+                }, 50);
+            }
+        }
+
+        function combine(a, b, weightB) {
             if (weightB < 0) weightB = 0;
             var c = {
                 r: a.r,
@@ -105,17 +137,6 @@ How much in group variation is there?
 
             return c;
         };
-
-        Qualtrics.SurveyEngine.addOnload(function ()
-        {
-            console.log(this);
-            console.log(this.questionContainer);
-
-            window.aa = this.questionContainer;
-
-            //$$('[id$="~QuestionID"]').parent().find(".container")
-            return;
-        });
     })();
 
 </script>

@@ -82,7 +82,7 @@ What percentage of DNA do humans and frogs share in common?
 
     Qualtrics.SurveyEngine.addOnload(function ()
     {
-
+        //load data from Qualtrics API, which sets 'this'
         var qName = this.questionId;
         var responseFieldId = "QR~" + qName;
         var container = jQuery(this.questionContainer).find('.container')[0];
@@ -98,7 +98,7 @@ What percentage of DNA do humans and frogs share in common?
         jQuery(container).width(width + "px");
         jQuery(container).height((height + 30) + "px");
 
-        //draw circles
+        //draw stage
         var R = Raphael(container, width, height);
 
         var c = getColor(leftColor);
