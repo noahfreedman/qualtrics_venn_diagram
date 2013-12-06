@@ -11,8 +11,11 @@ What percentage of DNA do humans and frogs share in common?
         -o-user-select: none;
         user-select: none;
     }
+    .venn_container {
+        margin: 20px;
+    }
 </style>
-<div class="container"/>
+<div class="venn_container"/>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript" src="//smile.stanford.edu/noah/raphael_2_1_dragFix.min.js"></script>
 <script type="text/javascript">
@@ -85,10 +88,8 @@ What percentage of DNA do humans and frogs share in common?
         //load data from Qualtrics API, which sets 'this'
         var qName = this.questionId;
         var responseFieldId = "QR~" + qName;
-        var container = jQuery(this.questionContainer).find('.container')[0];
+        var container = jQuery(this.questionContainer).find('.venn_container')[0];
         var input =  jQuery('#' + qName).find('.InputText')[0];
-
-        console.log(responseFieldId);
 
         if (!hideInput) {
             var tt = "<p>Percentage similarity:</p>";
