@@ -173,7 +173,7 @@ What percentage of DNA do humans and frogs share in common?
                 var percentOverlap = Math.round(overlapArea / area * 100);
                 if (isNaN(percentOverlap)) percentOverlap = 100;
             } else {
-                percentOverlap = Math.round(d / circle_radius_pixels * 50);
+                percentOverlap = 100 - Math.round(d / circle_radius_pixels * 50);
             }
             input.setValue(percentOverlap);
         }
